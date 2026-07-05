@@ -12,6 +12,7 @@ Multi-agent LLM trading framework for intraday analysis. Runs 12 specialized AI 
 - [OpenCode Pipeline — How It Works](#opencode-pipeline--how-it-works)
 - [Supported Instruments](#supported-instruments)
 - [Configuration](#configuration)
+- [Web Dashboard](#web-dashboard)
 - [Project Structure](#project-structure)
 - [Troubleshooting](#troubleshooting)
 - [Русская версия](#русская-версия)
@@ -197,6 +198,22 @@ cp .env.example .env    # add API keys
 docker compose run --rm tradingagents
 ```
 
+### Web Dashboard
+
+Visual interface to view past analyses, track progress, and launch new runs.
+
+```bash
+pip install ".[web]"
+python run_web.py
+# → http://localhost:8000
+```
+
+Features:
+- Dashboard with all past analyses (ticker, status, rating)
+- Detailed report view (all 12 agent outputs)
+- Launch new analyses directly from the browser
+- Real-time progress tracking
+
 ---
 
 ## Project Structure
@@ -213,8 +230,15 @@ TradingAgents/
 │   ├── dataflows/               # Data source adapters
 │   ├── graph/                   # LangGraph orchestration
 │   └── llm_clients/             # LLM provider abstraction
+├── web/                         # Web dashboard
+│   ├── app.py                   # FastAPI application
+│   ├── scanner.py               # Parse runs/ directory
+│   ├── runner.py                # Background analysis runner
+│   ├── templates/               # HTML templates
+│   └── static/                  # CSS + JS
 ├── cli/                         # Interactive CLI
 ├── tests/                       # Test suite
+├── run_web.py                   # Web dashboard entry point
 └── opencode.json                # OpenCode config (mimo-v2.5-free)
 ```
 
@@ -426,6 +450,22 @@ cp .env.example .env    # добавьте API ключи
 docker compose run --rm tradingagents
 ```
 
+### Веб-dashboard
+
+Визуальный интерфейс для просмотра прошлых анализов, отслеживания прогресса и запуска новых.
+
+```bash
+pip install ".[web]"
+python run_web.py
+# → http://localhost:8000
+```
+
+Возможности:
+- Дашборд со всеми прошлыми анализами (тикер, статус, рейтинг)
+- Детальный просмотр отчётов (все 12 выводов агентов)
+- Запуск новых анализов прямо из браузера
+- Отслеживание прогресса в реальном времени
+
 ---
 
 ## Структура проекта
@@ -442,8 +482,15 @@ TradingAgents/
 │   ├── dataflows/               # Адаптеры источников данных
 │   ├── graph/                   # Оркестрация LangGraph
 │   └── llm_clients/             # Абстракция провайдеров LLM
+├── web/                         # Веб-dashboard
+│   ├── app.py                   # FastAPI приложение
+│   ├── scanner.py               # Парсинг директории runs/
+│   ├── runner.py                # Фоновый запуск анализов
+│   ├── templates/               # HTML шаблоны
+│   └── static/                  # CSS + JS
 ├── cli/                         # Интерактивный CLI
 ├── tests/                       # Тесты
+├── run_web.py                   # Точка входа веб-dashboard
 └── opencode.json                # Конфиг OpenCode (mimo-v2.5-free)
 ```
 

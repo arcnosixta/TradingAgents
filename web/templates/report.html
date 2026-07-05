@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ run.ticker }} {{ run.date }} — TradingAgents{% endblock %}
+
+{% block content %}
+<div class="report-header">
+    <a href="/" class="btn btn-sm">&larr; Back</a>
+    <h1>{{ run.ticker }} <span class="dim">{{ run.date }}</span></h1>
+    <span class="badge badge-{{ run.status }}">{{ run.status }}</span>
+    <span class="dim">{{ run.elapsed_display }}</span>
+</div>
+
+{% if run.rating %}
+<div class="decision-card">
+    <div class="decision-rating rating-{{ run.rating|lower }}">{{ run.rating }}</div>
+    <div class="decision-text">
+        {% if run.reports.get("final_decision") %}
+        {% for line in run.reports["final_decision"].split("\n") %}
+        {% if line.strip() %}
+        <p>{{ line }}</p>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="reports-grid">
+    {% for key in report_order %}
+    {% if key in run.reports %}
+    <div class="report-card">
+        <h3>{{ report_names.get(key, key) }}</h3>
+        <div class="report-content markdown-body">
+            {{ run.reports[key] | replace("\n", "<br>") | safe }}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

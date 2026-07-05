@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — TradingAgents{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Analyses</h1>
+    <button class="btn btn-primary" onclick="openNewRunModal()">+ New Analysis</button>
+</div>
+
+{% if running and running.status == "running" %}
+<div class="running-banner">
+    <div class="spinner"></div>
+    <span>Running: <strong>{{ running.ticker }}</strong> ({{ running.agents_done }}/{{ running.agents_total }} agents)</span>
+</div>
+{% endif %}
+
+<table class="runs-table">
+    <thead>
+        <tr>
+            <th>Ticker</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Agents</th>
+            <th>Time</th>
+            <th>Rating</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for run in runs %}
+        <tr class="run-row status-{{ run.status }}">
+            <td class="ticker">{{ run.ticker }}</td>
+            <td>{{ run.date }}</td>
+            <td>
+                <span class="badge badge-{{ run.status }}">{{ run.status }}</span>
+            </td>
+            <td>{{ run.agents_completed }}/{{ run.agents_total }}</td>
+            <td>{{ run.elapsed_display }}</td>
+            <td>
+                {% if run.rating %}
+                <span class="rating rating-{{ run.rating|lower }}">{{ run.rating }}</span>
+                {% else %}—{% endif %}
+            </td>
+            <td>
+                <a href="/report/{{ run.run_id }}" class="btn btn-sm">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% if not runs %}
+        <tr>
+            <td colspan="7" class="empty-state">No analyses yet. Click "+ New Analysis" to start.</td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<div id="newRunModal" class="modal" style="display:none">
+    <div class="modal-content">
+        <h2>New Analysis</h2>
+        <form id="newRunForm" onsubmit="startRun(event)">
+            <label>Ticker</label>
+            <input type="text" name="ticker" placeholder="XAU-USD, BTC-USD, AAPL..." required>
+            <label>Date</label>
+            <input type="date" name="trade_date" value="{{ now }}" required>
+            <div class="modal-actions">
+                <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Start</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
