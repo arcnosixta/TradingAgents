@@ -2,6 +2,22 @@
 
 Multi-agent LLM trading framework for intraday analysis. Runs 12 specialized AI agents sequentially to produce actionable trade signals.
 
+---
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Install OpenCode](#install-opencode)
+- [Two Ways to Run](#two-ways-to-run)
+- [OpenCode Pipeline — How It Works](#opencode-pipeline--how-it-works)
+- [Supported Instruments](#supported-instruments)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Troubleshooting](#troubleshooting)
+- [Русская версия](#русская-версия)
+
+---
+
 ## Quick Start
 
 ```bash
@@ -10,11 +26,69 @@ cd TradingAgents
 pip install .
 ```
 
+## Install OpenCode
+
+The recommended pipeline uses [OpenCode](https://opencode.ai) — a free, open-source AI coding agent. Install it on your platform:
+
+### Linux
+
+```bash
+# Any distro (curl installer)
+curl -fsSL https://opencode.ai/install | bash
+
+# Arch / Manjaro (AUR)
+paru -S opencode
+```
+
+Or install the **Desktop app** (Beta):
+- `.deb` — Ubuntu/Debian: `sudo dpkg -i opencode-desktop-linux-x64.deb`
+- `.rpm` — Fedora/RHEL: `sudo rpm -i opencode-desktop-linux-x64.rpm`
+
+### macOS
+
+```bash
+# Homebrew (recommended)
+brew install anomalyco/tap/opencode
+
+# Or Desktop app
+brew install --cask opencode-desktop
+```
+
+Direct download: [Apple Silicon](https://opencode.ai/download/stable/darwin-aarch64-dmg) | [Intel](https://opencode.ai/download/stable/darwin-x64-dmg)
+
+### Windows
+
+Download the installer: [opencode-desktop-windows-x64.exe](https://opencode.ai/download/stable/windows-x64-nsis)
+
+Or install via package managers:
+
+```powershell
+# npm
+npm i -g opencode-ai
+
+# bun
+bun add -g opencode-ai
+```
+
+### IDE Extensions
+
+OpenCode also works as an extension inside your editor:
+
+| Editor | Install |
+|--------|---------|
+| VS Code | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+| Cursor | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+| Zed | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+| Windsurf | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+| VSCodium | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+
+---
+
 ## Two Ways to Run
 
 ### 1. OpenCode Pipeline (recommended)
 
-Runs 12 agents via [OpenCode CLI](https://opencode.ai) with free models. No API keys needed.
+Runs 12 agents via OpenCode CLI with free models. **No API keys needed.**
 
 ```bash
 cd opencode_pipeline
@@ -45,6 +119,8 @@ ta = TradingAgentsGraph(debug=True, config=DEFAULT_CONFIG.copy())
 _, decision = ta.propagate("NVDA", "2026-01-15")
 ```
 
+---
+
 ## OpenCode Pipeline — How It Works
 
 1. **Data Collection** — fetches OHLCV, indicators, news, sentiment, macro data via Yahoo Finance
@@ -69,6 +145,8 @@ _, decision = ta.propagate("NVDA", "2026-01-15")
 | 11 | Neutral Risk | Balanced assessment |
 | 12 | Portfolio Manager | Final decision with lot size |
 
+---
+
 ## Supported Instruments
 
 Any ticker Yahoo Finance covers:
@@ -82,6 +160,8 @@ Any ticker Yahoo Finance covers:
 | Crypto | `BTC-USD`, `ETH-USD` |
 | Indices | `SPX500`, `NAS100`, `US30` |
 | Oil | `WTICOUSD`, `BCOUSD` |
+
+---
 
 ## Configuration
 
@@ -117,6 +197,8 @@ cp .env.example .env    # add API keys
 docker compose run --rm tradingagents
 ```
 
+---
+
 ## Project Structure
 
 ```
@@ -136,6 +218,8 @@ TradingAgents/
 └── opencode.json                # OpenCode config (mimo-v2.5-free)
 ```
 
+---
+
 ## Troubleshooting
 
 **"No module named tradingagents"**
@@ -152,6 +236,237 @@ Get a free key at https://fred.stlouisfed.org/docs/api/api_key.html
 **Reddit/StockTwits errors**
 Rate limits — non-critical, analysis continues without them.
 
+---
+
 ## License
+
+MIT
+
+---
+---
+
+# Русская версия
+
+## Краткое начало
+
+```bash
+git clone https://github.com/arcnosixta/TradingAgents.git
+cd TradingAgents
+pip install .
+```
+
+## Установка OpenCode
+
+Рекомендуемый пайплайн использует [OpenCode](https://opencode.ai) — бесплатный open-source AI агент для кода. Установите его на своей платформе:
+
+### Linux
+
+```bash
+# Любая дистрибуция (curl установщик)
+curl -fsSL https://opencode.ai/install | bash
+
+# Arch / Manjaro (AUR)
+paru -S opencode
+```
+
+Или установите **Desktop приложение** (Beta):
+- `.deb` — Ubuntu/Debian: `sudo dpkg -i opencode-desktop-linux-x64.deb`
+- `.rpm` — Fedora/RHEL: `sudo rpm -i opencode-desktop-linux-x64.rpm`
+
+### macOS
+
+```bash
+# Homebrew (рекомендуется)
+brew install anomalyco/tap/opencode
+
+# Или Desktop приложение
+brew install --cask opencode-desktop
+```
+
+Прямая загрузка: [Apple Silicon](https://opencode.ai/download/stable/darwin-aarch64-dmg) | [Intel](https://opencode.ai/download/stable/darwin-x64-dmg)
+
+### Windows
+
+Скачайте установщик: [opencode-desktop-windows-x64.exe](https://opencode.ai/download/stable/windows-x64-nsis)
+
+Или установите через менеджеры пакетов:
+
+```powershell
+# npm
+npm i -g opencode-ai
+
+# bun
+bun add -g opencode-ai
+```
+
+### Расширения для IDE
+
+OpenCode также работает как расширение в вашем редакторе:
+
+| Редактор | Установка |
+|----------|-----------|
+| VS Code | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+| Cursor | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+| Zed | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+| Windsurf | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+| VSCodium | [opencode.ai/docs/ide](https://opencode.ai/docs/ide/) |
+
+---
+
+## Два способа запуска
+
+### 1. OpenCode пайплайн (рекомендуется)
+
+Запускает 12 агентов через OpenCode CLI с бесплатными моделями. **API ключи не нужны.**
+
+```bash
+cd opencode_pipeline
+python orchestrator.py              # XAU-USD (по умолчанию)
+python orchestrator.py BTC-USD      # Биткоин
+python orchestrator.py AAPL         # Apple
+python orchestrator.py --trade_date 2026-07-03
+```
+
+Результаты сохраняются в `runs/<TICKER>_<DATE>_<TIMESTAMP>/reports/`.
+
+### 2. LangGraph пайплайн (оригинальный)
+
+Использует прямые API вызовы LLM. Требуется API ключ.
+
+```bash
+tradingagents                        # интерактивный CLI
+python -m cli.main                   # альтернатива
+```
+
+Или программно:
+
+```python
+from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.default_config import DEFAULT_CONFIG
+
+ta = TradingAgentsGraph(debug=True, config=DEFAULT_CONFIG.copy())
+_, decision = ta.propagate("NVDA", "2026-01-15")
+```
+
+---
+
+## Как работает OpenCode пайплайн
+
+1. **Сбор данных** — загружает OHLCV, индикаторы, новости,_sentiment, макро-данные через Yahoo Finance
+2. **12 AI агентов** — каждый читает файлы данных и пишет отчёт
+3. **Правила согласования** — трейдер и портфельный менеджер должны согласовываться с рейтингом исследовательского менеджера
+4. **Финальное решение** — вход, стоп-лосс, тейк-профит, размер лота для MetaTrader5
+
+### Агенты
+
+| # | Агент | Роль |
+|---|-------|------|
+| 1 | Маркет аналитик | Технический анализ H1/H4, уровни поддержки/сопротивления |
+| 2 | Сентимент аналитик | Оценка sentiment новостей, Reddit, StockTwits |
+| 3 | Ньюс аналитик | Макро-события, центральные банки, геополитика |
+| 4 | Фундаментальный аналитик | Финансы компаний (только акции) |
+| 5 | Бычий исследователь | Аргументы ЗА покупку |
+| 6 | Медвежий исследователь | Аргументы ПРОТИВ покупки |
+| 7 | Исследовательский менеджер | Финальный рейтинг на основе дебатов быков и медведей |
+| 8 | Трейдер | Вход/стоп/тейк-профит для MT5 |
+| 9 | Агрессивный риск | Анализ максимального апсайда |
+| 10 | Консервативный риск | Сохранение капитала |
+| 11 | Нейтральный риск | Сбалансированная оценка |
+| 12 | Портфельный менеджер | Финальное решение с размером лота |
+
+---
+
+## Поддерживаемые инструменты
+
+Любой тикер из Yahoo Finance:
+
+| Рынок | Примеры |
+|-------|---------|
+| Акции США | `AAPL`, `SPY`, `NVDA` |
+| Золото | `XAU-USD`, `XAUUSD`, `GOLD` |
+| Серебро | `XAG-USD`, `XAGUSD` |
+| Форекс | `EURUSD`, `GBPJPY` |
+| Крипто | `BTC-USD`, `ETH-USD` |
+| Индексы | `SPX500`, `NAS100`, `US30` |
+| Нефть | `WTICOUSD`, `BCOUSD` |
+
+---
+
+## Конфигурация
+
+### Настройки по умолчанию (`opencode.json`)
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "opencode/mimo-v2.5-free"
+}
+```
+
+Измените модель, отредактировав этот файл или передав `-m provider/model` в `opencode run`.
+
+### Переменные окружения (LangGraph пайплайн)
+
+```bash
+# Провайдеры LLM (выберите один)
+export OPENAI_API_KEY=...
+export GOOGLE_API_KEY=...
+export ANTHROPIC_API_KEY=...
+export DEEPSEEK_API_KEY=...
+
+# Источники данных (необязательно)
+export ALPHA_VANTAGE_API_KEY=...
+export FRED_API_KEY=...
+```
+
+### Docker
+
+```bash
+cp .env.example .env    # добавьте API ключи
+docker compose run --rm tradingagents
+```
+
+---
+
+## Структура проекта
+
+```
+TradingAgents/
+├── opencode_pipeline/           # Пайплайн на основе OpenCode
+│   ├── orchestrator.py          # Главная точка входа
+│   ├── data_collector.py        # Фаза 0: сбор всех данных
+│   ├── agent_runner.py          # Запуск OpenCode CLI для каждого агента
+│   └── prompts/                 # 12 шаблонов промптов агентов
+├── tradingagents/               # Основная библиотека (LangGraph пайплайн)
+│   ├── agents/                  # Определения агентов
+│   ├── dataflows/               # Адаптеры источников данных
+│   ├── graph/                   # Оркестрация LangGraph
+│   └── llm_clients/             # Абстракция провайдеров LLM
+├── cli/                         # Интерактивный CLI
+├── tests/                       # Тесты
+└── opencode.json                # Конфиг OpenCode (mimo-v2.5-free)
+```
+
+---
+
+## Решение проблем
+
+**"No module named tradingagents"**
+```bash
+pip install -e .    # editable установка из корня проекта
+```
+
+**OHLCV данные показывают нули**
+Убедитесь, что установили локально: `pip install -e .` (не из PyPI).
+
+**Ошибки макро-данных (FRED_API_KEY)**
+Получите бесплатный ключ на https://fred.stlouisfed.org/docs/api/api_key.html
+
+**Ошибки Reddit/StockTwits**
+Лимиты запросов — некритично, анализ продолжается без них.
+
+---
+
+## Лицензия
 
 MIT
