@@ -8,6 +8,10 @@ import time
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.agents.utils.memory import TradingMemoryLog
 from tradingagents.agents.utils.agent_utils import resolve_instrument_identity, build_instrument_context
+from tradingagents.agents.utils.entry_validator import (
+    parse_current_price_from_snapshot,
+    apply_validation_to_report,
+)
 from data_collector import collect_data
 from agent_runner import run_agent
 
@@ -55,6 +59,16 @@ def main():
     # Phase 0: Collect Data
     collect_data(ticker, start_date, trade_date, trade_date, run_dir)
     
+    # Extract current price from snapshot for trader prompt
+    snapshot_path = os.path.join(run_dir, "data", "snapshot.md")
+    current_price_data = parse_current_price_from_snapshot(snapshot_path)
+    if current_price_data:
+        logger.info(f"Current price from snapshot: close={current_price_data['close']}, "
+                     f"high={current_price_data['high']}, low={current_price_data['low']}")
+    else:
+        logger.warning("Could not parse current price from snapshot, using defaults")
+        current_price_data = {"close": 0.0, "high": 0.0, "low": 0.0}
+    
     # Memory past context
     memory = TradingMemoryLog(DEFAULT_CONFIG)
     past_context = memory.get_past_context(ticker, n_same=5, n_cross=3)
@@ -71,7 +85,10 @@ def main():
         "trade_date": trade_date,
         "start_date": start_date,
         "end_date": trade_date,
-        "instrument_context": instrument_context
+        "instrument_context": instrument_context,
+        "current_price": current_price_data["close"],
+        "day_high": current_price_data["high"],
+        "day_low": current_price_data["low"],
     }
 
     prompts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prompts")
@@ -91,6 +108,16 @@ def main():
             logger.error(f"Failed {role}: {e}")
             status = f"failed: {e}"
             stdout = ""
+
+        # Validate trader entry/stop levels after trader stage
+        if role == "trader" and status == "success":
+            trader_report = os.path.join(run_dir, output_file)
+            if current_price_data["close"] > 0:
+                result = apply_validation_to_report(trader_report, current_price_data["close"])
+                if result and not result.is_valid:
+                    logger.warning(f"Trader entry/stop corrected: {result.summary}")
+                elif result:
+                    logger.info("Trader entry/stop validated: PASS")
             
         elapsed = time.time() - start_t
         run_log[role] = {
