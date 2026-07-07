@@ -3,6 +3,8 @@
 Прочитай:
 - reports/research_plan.md (СМОТРИ НА RATING — это твой основной ориентир)
 - reports/market.md (интрадей уровни для entry/stop-loss)
+- reports/smart_money_4h.md (HTF контекст — если существует)
+- reports/smart_money_15m.md (точные entry zones — если существует)
 
 {instrument_context}
 

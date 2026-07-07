@@ -5,8 +5,12 @@
 - reports/risk_aggressive.md
 - reports/market.md
 - reports/sentiment.md
+- reports/smart_money_15m.md (micro entry zones — если существует)
 
 {instrument_context}
+
+ТЕКУЩАЯ ЦЕНА: {current_price}
+ВСЕ ТВОИ УРОВНИ (entry, stop, TP) ДОЛЖНЫ БЫТЬ В ПРЕДЕЛАХ 100 ПУНКТОВ ОТ ТЕКУЩЕЙ ЦЕНЫ.
 
 КРИТИЧЕСКИЙ КОНТЕКСТ: MetaTrader5. Стопы 50-100 пунктов. Горизонт 12-24ч.
 

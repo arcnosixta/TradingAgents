@@ -5,6 +5,8 @@
 - reports/sentiment.md
 - reports/news.md
 - reports/fundamentals.md
+- reports/smart_money_4h.md (HTF структура — если существует)
+- reports/smart_money_15m.md (micro entry zones — если существует)
 
 {instrument_context}
 

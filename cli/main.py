@@ -1266,6 +1266,85 @@ def run_analysis(checkpoint: bool | None = None):
     if display_choice in ("Y", "YES", ""):
         display_complete_report(final_state)
 
+    # Offer TP/SL monitoring if there's an active position
+    final_decision = final_state.get("final_trade_decision", "")
+    from tradingagents.agents.utils.entry_validator import parse_trader_proposal
+    parsed = parse_trader_proposal(final_decision)
+    if parsed.get("action") in ("Buy", "Sell") and parsed.get("entry_price"):
+        monitor_choice = typer.prompt(
+            "\nEnable TP/SL monitoring? (checks price every 60s)",
+            default="Y"
+        ).strip().upper()
+        if monitor_choice in ("Y", "YES", ""):
+            from tradingagents.monitoring import TradeMonitor
+            monitor = TradeMonitor(
+                poll_interval=60,
+                positions_file=Path.home() / ".tradingagents" / "positions.json",
+            )
+            monitor.add_position(
+                ticker=selections["ticker"],
+                entry=parsed["entry_price"],
+                sl=parsed.get("stop_loss") or 0,
+                tp=parsed.get("take_profit") or 0,
+                action=parsed["action"],
+            )
+            monitor.start()
+            console.print("[green]Monitoring active. Press Ctrl+C to stop.[/green]")
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                monitor.stop()
+                console.print("\n[yellow]Monitor stopped.[/yellow]")
+
+
+@app.command()
+def watchlist(
+    action: str = typer.Argument("show", help="Action: show, add, remove, run"),
+    ticker: str = typer.Option(None, help="Ticker symbol (for add/remove/run)"),
+    interval: int = typer.Option(360, help="Re-analysis interval in minutes (for add)"),
+):
+    """Manage and run watchlist analysis."""
+    from tradingagents.watchlist import WatchlistRunner, _format_watchlist_table
+
+    runner = WatchlistRunner()
+
+    if action == "show":
+        entries = runner.list_entries()
+        console.print(_format_watchlist_table(entries))
+
+    elif action == "add":
+        if not ticker:
+            console.print("[red]--ticker is required for add[/red]")
+            return
+        from cli.utils import detect_asset_type
+        asset = detect_asset_type(ticker)
+        runner.add_ticker(ticker, asset_type=asset, interval_minutes=interval)
+        console.print(f"[green]Added {ticker.upper()} ({asset}) to watchlist[/green]")
+
+    elif action == "remove":
+        if not ticker:
+            console.print("[red]--ticker is required for remove[/red]")
+            return
+        runner.remove_ticker(ticker)
+        console.print(f"[yellow]Removed {ticker.upper()} from watchlist[/yellow]")
+
+    elif action == "run":
+        if ticker:
+            console.print(f"[cyan]Analyzing {ticker.upper()}...[/cyan]")
+        else:
+            due = runner.get_due_entries()
+            console.print(f"[cyan]{len(due)} ticker(s) due for analysis[/cyan]")
+        results = runner.run_once(ticker=ticker)
+        for r in results:
+            if r["status"] == "ok":
+                console.print(f"  [green]{r['ticker']}: {r['decision']}[/green]")
+            else:
+                console.print(f"  [red]{r['ticker']}: {r['error']}[/red]")
+
+    else:
+        console.print(f"[red]Unknown action: {action}. Use show/add/remove/run[/red]")
+
 
 @app.command()
 def analyze(

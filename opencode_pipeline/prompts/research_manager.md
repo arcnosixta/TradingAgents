@@ -4,10 +4,16 @@
 - reports/bull_case.md
 - reports/bear_case.md
 - reports/market.md (интрадей уровни)
+- reports/smart_money_4h.md (HTF структура — если существует)
+- reports/smart_money_15m.md (micro entry zones — если существует)
 
 {instrument_context}
 
 КРИТИЧЕСКИЙ КОНТЕКСТ: Горизонт — 12-24 часа. Торговля через MetaTrader5. Стопы 50-100 пунктов.
+
+УЧИТЫВАЙ Smart Money уровни при принятии решения:
+- Если Smart Money 4H показывает bullish bias → это подкрепляет Buy рейтинг
+- Если Smart Money 15M показывает точную entry zone → используй её в INTRADAY_ACTIONS
 
 ЗАДАЧА: Определи рейтинг (РОВНО ОДНО из пяти):
 - Buy — сильная уверенность в росте на 12-24ч

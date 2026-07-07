@@ -419,6 +419,12 @@ class TradingAgentsGraph:
         # Store current state for reflection.
         self.curr_state = final_state
 
+        # Append live price snapshot to the final decision so the user sees
+        # the actual current price vs. the entry/SL/TP levels the trader proposed.
+        final_state["final_trade_decision"] = self._append_live_price_snapshot(
+            final_state["final_trade_decision"], company_name,
+        )
+
         # Log state to disk.
         self._log_state(trade_date, final_state)
 
@@ -482,3 +488,68 @@ class TradingAgentsGraph:
     def process_signal(self, full_signal):
         """Process a signal to extract the core decision."""
         return self.signal_processor.process_signal(full_signal)
+
+    def _append_live_price_snapshot(self, decision_text: str, ticker: str) -> str:
+        """Append a live price snapshot with recalculated levels to the decision.
+
+        Fetches the current price via yfinance (fast, no LLM) and shows
+        the user whether the proposed entry is still reachable and how
+        far the price has moved since the analysis was generated.
+        """
+        from tradingagents.agents.utils.entry_validator import parse_trader_proposal
+        from tradingagents.dataflows.cache import market_cache
+        from tradingagents.dataflows.symbol_utils import normalize_symbol
+
+        try:
+            cache_key = {"namespace": "yf_price", "ticker": ticker}
+            current_price = market_cache.get(**cache_key)
+            if current_price is None:
+                current_price = yf.Ticker(normalize_symbol(ticker)).fast_info.get("lastPrice")
+                if current_price and current_price > 0:
+                    market_cache.set("yf_price", current_price, ttl=60, ticker=ticker)
+        except Exception:
+            current_price = None
+
+        if current_price is None or current_price <= 0:
+            return decision_text
+
+        parsed = parse_trader_proposal(decision_text)
+        action = parsed.get("action")
+        entry = parsed.get("entry_price")
+        sl = parsed.get("stop_loss")
+        tp = parsed.get("take_profit")
+
+        lines = [
+            "\n\n---",
+            "## LIVE PRICE SNAPSHOT",
+            f"**Current price:** {current_price:.2f}",
+        ]
+
+        if action and action != "Hold" and entry is not None:
+            offset = current_price - entry
+            direction = "above" if offset > 0 else "below"
+
+            if action == "Buy":
+                reachable = offset >= -30  # within 30 pts of entry
+            else:
+                reachable = offset <= 30
+
+            status = "IN RANGE" if reachable else "PRICE MOVED"
+            lines.append(f"**Entry proposed:** {entry:.2f} ({abs(offset):.1f} pts {direction}) — [{status}]")
+
+            if sl is not None:
+                sl_dist = abs(current_price - sl)
+                lines.append(f"**Stop loss:** {sl:.2f} ({sl_dist:.1f} pts from current)")
+            if tp is not None:
+                tp_dist = abs(tp - current_price)
+                lines.append(f"**Take profit:** {tp:.2f} ({tp_dist:.1f} pts from current)")
+
+            if not reachable:
+                lines.append("")
+                lines.append("> **WARNING:** Price has moved significantly since analysis. "
+                             "Consider waiting for a pullback or re-running analysis.")
+        else:
+            lines.append(f"**Proposed action:** {action or 'N/A'}")
+
+        lines.append("---")
+        return decision_text + "\n".join(lines)

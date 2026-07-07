@@ -148,6 +148,7 @@ def validate_entry_levels(
     max_entry_offset: float = 30.0,
     max_stop_distance: float = 100.0,
     min_stop_distance: float = 20.0,
+    atr: float | None = None,
 ) -> ValidationResult:
     """Validate and fix Trader entry/stop levels.
 
@@ -160,6 +161,8 @@ def validate_entry_levels(
         max_entry_offset: Max allowed distance (points) from current price.
         max_stop_distance: Max allowed stop distance from entry.
         min_stop_distance: Min stop distance (too tight = noise stop).
+        atr: Average True Range — if provided, stop bounds are ATR-dependent:
+             min_stop = max(20, 0.5 * ATR), max_stop = min(100, 1.5 * ATR).
 
     Returns:
         ValidationResult with corrected levels and list of fixes.
@@ -192,27 +195,36 @@ def validate_entry_levels(
     if stop_loss is not None and entry_price is not None:
         stop_distance = abs(stop_loss - entry_price)
 
-        if stop_distance > max_stop_distance:
+        # ATR-dependent bounds
+        effective_min = min_stop_distance
+        effective_max = max_stop_distance
+        if atr is not None and atr > 0:
+            effective_min = max(min_stop_distance, round(0.5 * atr))
+            effective_max = min(max_stop_distance, round(1.5 * atr))
+            if effective_min > effective_max:
+                effective_min, effective_max = effective_max, effective_min
+
+        if stop_distance > effective_max:
             # Fix: clamp stop to max_distance from entry
             if action == "Buy":
-                stop_loss = round(entry_price - max_stop_distance, 2)
+                stop_loss = round(entry_price - effective_max, 2)
             else:
-                stop_loss = round(entry_price + max_stop_distance, 2)
+                stop_loss = round(entry_price + effective_max, 2)
             fixes.append(
                 f"STOP fixed: was {stop_distance:.0f} pts from entry, "
-                f"clamped to {max_stop_distance:.0f} pts -> {stop_loss}"
+                f"clamped to {effective_max:.0f} pts -> {stop_loss}"
             )
             valid = False
 
-        elif stop_distance < min_stop_distance:
+        elif stop_distance < effective_min:
             # Fix: stop too tight, widen to min_distance
             if action == "Buy":
-                stop_loss = round(entry_price - min_stop_distance, 2)
+                stop_loss = round(entry_price - effective_min, 2)
             else:
-                stop_loss = round(entry_price + min_stop_distance, 2)
+                stop_loss = round(entry_price + effective_min, 2)
             fixes.append(
                 f"STOP fixed: was {stop_distance:.0f} pts (too tight), "
-                f"widened to {min_stop_distance:.0f} pts -> {stop_loss}"
+                f"widened to {effective_min:.0f} pts -> {stop_loss}"
             )
             valid = False
 
@@ -240,13 +252,103 @@ def validate_entry_levels(
     )
 
 
+def validate_consistency(
+    trader_entry: float | None,
+    pm_entry: float | None,
+    max_diff: float = 20.0,
+) -> tuple[float | None, list[str]]:
+    """Check consistency between Trader and Portfolio Manager entry prices.
+
+    If the difference exceeds *max_diff* points the PM entry is pulled toward
+    the Trader entry (Trader is closer to the market).
+
+    Returns:
+        (corrected_pm_entry, list_of_warnings)
+    """
+    if trader_entry is None or pm_entry is None:
+        return pm_entry, []
+
+    diff = abs(pm_entry - trader_entry)
+    if diff <= max_diff:
+        return pm_entry, []
+
+    # Pull PM toward Trader
+    warnings = [
+        f"CONSISTENCY: PM entry {pm_entry} was {diff:.0f} pts from Trader "
+        f"entry {trader_entry} (max {max_diff:.0f}), corrected to {trader_entry}"
+    ]
+    return round(trader_entry, 2), warnings
+
+
+def calculate_lot_size(
+    entry_price: float,
+    stop_loss: float,
+    account_balance: float = 10000.0,
+    risk_pct: float = 0.01,
+    pip_value: float = 1.0,
+) -> float:
+    """Calculate lot size based on risk percentage and stop distance.
+
+    Args:
+        entry_price: Entry price.
+        stop_loss: Stop loss price.
+        account_balance: Total account balance (default $10,000).
+        risk_pct: Risk per trade as fraction (default 1%).
+        pip_value: Value per pip/point (default $1 for gold).
+
+    Returns:
+        Lot size rounded to 2 decimals, clamped to [0.01, 1.0].
+    """
+    risk_amount = account_balance * risk_pct
+    stop_distance = abs(entry_price - stop_loss)
+    if stop_distance <= 0:
+        return 0.01
+    lot_size = risk_amount / (stop_distance * pip_value)
+    return round(max(0.01, min(lot_size, 1.0)), 2)
+
+
+def parse_atr_from_indicators(indicators_path: str | Path) -> float | None:
+    """Parse ATR value from data/indicators.md.
+
+    Looks for patterns like "ATR (14): 93.21" or "ATR: 93.21".
+    Returns ATR value or None if not found.
+    """
+    path = Path(indicators_path)
+    if not path.exists():
+        return None
+
+    text = path.read_text(encoding="utf-8")
+
+    patterns = [
+        r"ATR\s*\((?:\d+)\)[:\s]+([\d,]+\.?\d*)",
+        r"ATR[:\s]+([\d,]+\.?\d*)",
+        r"\*\*ATR\*\*[:\s]+([\d,]+\.?\d*)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            val_str = match.group(1).replace(",", "")
+            try:
+                return float(val_str)
+            except ValueError:
+                continue
+    return None
+
+
 def apply_validation_to_report(
     report_path: str | Path,
     current_price: float,
+    atr: float | None = None,
 ) -> ValidationResult | None:
     """Read a trader_proposal.md, validate, and rewrite if corrected.
 
-    Returns ValidationResult or None if file can't be parsed.
+    Args:
+        report_path: Path to the report markdown file.
+        current_price: Current market price.
+        atr: Average True Range for ATR-dependent stop validation.
+
+    Returns:
+        ValidationResult or None if file can't be parsed.
     """
     path = Path(report_path)
     if not path.exists():
@@ -264,6 +366,7 @@ def apply_validation_to_report(
         take_profit=parsed["take_profit"],
         current_price=current_price,
         action=parsed["action"],
+        atr=atr,
     )
 
     if not result.is_valid:

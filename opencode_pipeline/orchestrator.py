@@ -11,6 +11,9 @@ from tradingagents.agents.utils.agent_utils import resolve_instrument_identity, 
 from tradingagents.agents.utils.entry_validator import (
     parse_current_price_from_snapshot,
     apply_validation_to_report,
+    validate_consistency,
+    parse_trader_proposal,
+    parse_atr_from_indicators,
 )
 from data_collector import collect_data
 from agent_runner import run_agent
@@ -23,6 +26,8 @@ PIPELINE_STAGES = [
     ("sentiment", "sentiment_analyst.md", "reports/sentiment.md"),
     ("news", "news_analyst.md", "reports/news.md"),
     ("fundamentals", "fundamentals_analyst.md", "reports/fundamentals.md"),
+    ("smart_money_4h", "smart_money_4h.md", "reports/smart_money_4h.md"),
+    ("smart_money_15m", "smart_money_15m.md", "reports/smart_money_15m.md"),
     ("bull_researcher", "bull_researcher.md", "reports/bull_case.md"),
     ("bear_researcher", "bear_researcher.md", "reports/bear_case.md"),
     ("research_manager", "research_manager.md", "reports/research_plan.md"),
@@ -91,6 +96,15 @@ def main():
         "day_low": current_price_data["low"],
     }
 
+    # Parse ATR from indicators for stop validation
+    indicators_path = os.path.join(run_dir, "data", "indicators.md")
+    atr = parse_atr_from_indicators(indicators_path)
+    if atr is not None:
+        logger.info(f"ATR from indicators: {atr}")
+        format_kwargs["atr"] = atr
+    else:
+        logger.info("ATR not found in indicators, using default stop bounds")
+
     prompts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prompts")
 
     run_log = {}
@@ -113,11 +127,52 @@ def main():
         if role == "trader" and status == "success":
             trader_report = os.path.join(run_dir, output_file)
             if current_price_data["close"] > 0:
-                result = apply_validation_to_report(trader_report, current_price_data["close"])
+                result = apply_validation_to_report(
+                    trader_report, current_price_data["close"], atr=atr
+                )
                 if result and not result.is_valid:
                     logger.warning(f"Trader entry/stop corrected: {result.summary}")
                 elif result:
                     logger.info("Trader entry/stop validated: PASS")
+
+        # Validate PM final_decision + consistency with trader
+        if role == "portfolio_manager" and status == "success":
+            pm_report = os.path.join(run_dir, output_file)
+            if current_price_data["close"] > 0:
+                # Validate PM entry/stop levels
+                result = apply_validation_to_report(
+                    pm_report, current_price_data["close"], atr=atr
+                )
+                if result and not result.is_valid:
+                    logger.warning(f"PM entry/stop corrected: {result.summary}")
+                elif result:
+                    logger.info("PM entry/stop validated: PASS")
+
+                # Consistency check: Trader vs PM entry
+                trader_path = os.path.join(run_dir, "reports/trader_proposal.md")
+                if os.path.exists(trader_path):
+                    trader_text = open(trader_path, encoding="utf-8").read()
+                    pm_text = open(pm_report, encoding="utf-8").read()
+                    trader_parsed = parse_trader_proposal(trader_text)
+                    pm_parsed = parse_trader_proposal(pm_text)
+                    corrected_entry, warnings = validate_consistency(
+                        trader_parsed["entry_price"],
+                        pm_parsed["entry_price"],
+                    )
+                    for w in warnings:
+                        logger.warning(w)
+                    # Apply consistency fix to PM report if needed
+                    if corrected_entry != pm_parsed["entry_price"] and corrected_entry is not None:
+                        import re as _re
+                        pm_corrected = _re.sub(
+                            r"(ENTRY_PRICE|Entry)[:\s]+[\d,]+\.?\d*",
+                            f"\\g<1>: {corrected_entry}",
+                            pm_text,
+                            flags=_re.IGNORECASE,
+                        )
+                        with open(pm_report, "w", encoding="utf-8") as f:
+                            f.write(pm_corrected)
+                        logger.info(f"PM entry corrected to {corrected_entry} for consistency with Trader")
             
         elapsed = time.time() - start_t
         run_log[role] = {
