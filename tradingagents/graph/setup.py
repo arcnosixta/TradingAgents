@@ -18,6 +18,8 @@ from tradingagents.agents import (
     create_portfolio_manager,
     create_research_manager,
     create_sentiment_analyst,
+    create_smart_money_15m,
+    create_smart_money_4h,
     create_trader,
 )
 from tradingagents.agents.utils.agent_states import AgentState
@@ -61,6 +63,8 @@ class GraphSetup:
             "social": lambda: create_sentiment_analyst(self.quick_thinking_llm),
             "news": lambda: create_news_analyst(self.quick_thinking_llm),
             "fundamentals": lambda: create_fundamentals_analyst(self.quick_thinking_llm),
+            "smart_money_4h": lambda: create_smart_money_4h(self.quick_thinking_llm),
+            "smart_money_15m": lambda: create_smart_money_15m(self.quick_thinking_llm),
         }
 
         # Create researcher and manager nodes

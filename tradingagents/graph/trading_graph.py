@@ -198,6 +198,20 @@ class TradingAgentsGraph:
                     get_income_statement,
                 ]
             ),
+            "smart_money_4h": ToolNode(
+                [
+                    get_stock_data,
+                    get_indicators,
+                    get_verified_market_snapshot,
+                ]
+            ),
+            "smart_money_15m": ToolNode(
+                [
+                    get_stock_data,
+                    get_indicators,
+                    get_verified_market_snapshot,
+                ]
+            ),
         }
 
     def _resolve_benchmark(self, ticker: str) -> str:
@@ -452,6 +466,8 @@ class TradingAgentsGraph:
             "sentiment_report": final_state["sentiment_report"],
             "news_report": final_state["news_report"],
             "fundamentals_report": final_state["fundamentals_report"],
+            "smart_money_4h_report": final_state["smart_money_4h_report"],
+            "smart_money_15m_report": final_state["smart_money_15m_report"],
             "investment_debate_state": {
                 "bull_history": final_state["investment_debate_state"]["bull_history"],
                 "bear_history": final_state["investment_debate_state"]["bear_history"],

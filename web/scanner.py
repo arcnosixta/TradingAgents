@@ -12,6 +12,8 @@ REPORT_NAMES = {
     "sentiment": "Sentiment Analysis",
     "news": "News Analysis",
     "fundamentals": "Fundamentals Analysis",
+    "smart_money_4h": "Smart Money 4H",
+    "smart_money_15m": "Smart Money 15M",
     "bear_case": "Bear Researcher",
     "research_plan": "Research Manager",
     "trader_proposal": "Trader Proposal",
@@ -26,6 +28,8 @@ REPORT_ORDER = [
     "sentiment",
     "news",
     "fundamentals",
+    "smart_money_4h",
+    "smart_money_15m",
     "bear_case",
     "research_plan",
     "trader_proposal",
@@ -40,6 +44,8 @@ ALL_AGENTS = [
     "sentiment",
     "news",
     "fundamentals",
+    "smart_money_4h",
+    "smart_money_15m",
     "bull_researcher",
     "bear_researcher",
     "research_manager",
@@ -60,7 +66,7 @@ class RunInfo:
     path: str
     status: str = "unknown"
     agents_completed: int = 0
-    agents_total: int = 12
+    agents_total: int = 14
     elapsed_seconds: float = 0.0
     reports: dict = field(default_factory=dict)
     final_decision: str = ""

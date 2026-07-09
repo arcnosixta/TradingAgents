@@ -1,6 +1,6 @@
 # TradingAgents
 
-Multi-agent LLM trading framework for intraday analysis. Runs 12 specialized AI agents sequentially to produce actionable trade signals.
+Multi-agent LLM trading framework for intraday analysis. Runs 14 specialized AI agents sequentially to produce actionable trade signals.
 
 ---
 
@@ -137,14 +137,16 @@ _, decision = ta.propagate("NVDA", "2026-01-15")
 | 2 | Sentiment Analyst | News, Reddit, StockTwits sentiment scoring |
 | 3 | News Analyst | Macro events, central bank, geopolitics |
 | 4 | Fundamentals Analyst | Company financials (stocks only) |
-| 5 | Bull Researcher | Argument FOR buying |
-| 6 | Bear Researcher | Argument AGAINST buying |
-| 7 | Research Manager | Final rating based on bull/bear debate |
-| 8 | Trader | Entry/stop/take-profit for MT5 |
-| 9 | Aggressive Risk | Max upside analysis |
-| 10 | Conservative Risk | Capital preservation |
-| 11 | Neutral Risk | Balanced assessment |
-| 12 | Portfolio Manager | Final decision with lot size |
+| 5 | Smart Money 4H | Higher timeframe structure, order blocks, liquidity zones |
+| 6 | Smart Money 15M | Intraday micro-structure, entry zones, volume profile |
+| 7 | Bull Researcher | Argument FOR buying |
+| 8 | Bear Researcher | Argument AGAINST buying |
+| 9 | Research Manager | Final rating based on bull/bear debate |
+| 10 | Trader | Entry/stop/take-profit for MT5 |
+| 11 | Aggressive Risk | Max upside analysis |
+| 12 | Conservative Risk | Capital preservation |
+| 13 | Neutral Risk | Balanced assessment |
+| 14 | Portfolio Manager | Final decision with lot size |
 
 ---
 
@@ -227,6 +229,12 @@ TradingAgents/
 │   └── prompts/                 # 12 agent prompt templates
 ├── tradingagents/               # Core library (LangGraph pipeline)
 │   ├── agents/                  # Agent definitions
+│   │   ├── analysts/            # Market, Sentiment, News, Fundamentals, Smart Money
+│   │   ├── managers/            # Research Manager, Portfolio Manager
+│   │   ├── researchers/         # Bull, Bear researchers
+│   │   ├── risk_mgmt/           # Aggressive, Conservative, Neutral risk
+│   │   ├── trader/              # Trader agent
+│   │   └── utils/               # Tools, schemas, memory, validators
 │   ├── dataflows/               # Data source adapters
 │   ├── graph/                   # LangGraph orchestration
 │   └── llm_clients/             # LLM provider abstraction
@@ -389,14 +397,16 @@ _, decision = ta.propagate("NVDA", "2026-01-15")
 | 2 | Сентимент аналитик | Оценка sentiment новостей, Reddit, StockTwits |
 | 3 | Ньюс аналитик | Макро-события, центральные банки, геополитика |
 | 4 | Фундаментальный аналитик | Финансы компаний (только акции) |
-| 5 | Бычий исследователь | Аргументы ЗА покупку |
-| 6 | Медвежий исследователь | Аргументы ПРОТИВ покупки |
-| 7 | Исследовательский менеджер | Финальный рейтинг на основе дебатов быков и медведей |
-| 8 | Трейдер | Вход/стоп/тейк-профит для MT5 |
-| 9 | Агрессивный риск | Анализ максимального апсайда |
-| 10 | Консервативный риск | Сохранение капитала |
-| 11 | Нейтральный риск | Сбалансированная оценка |
-| 12 | Портфельный менеджер | Финальное решение с размером лота |
+| 5 | Smart Money 4H | Структура старшего таймфрейма, ордер блоки, зоны ликвидности |
+| 6 | Smart Money 15M | Интрадей микро-структуры, зоны входа, профиль объёма |
+| 7 | Бычий исследователь | Аргументы ЗА покупку |
+| 8 | Медвежий исследователь | Аргументы ПРОТИВ покупки |
+| 9 | Исследовательский менеджер | Финальный рейтинг на основе дебатов быков и медведей |
+| 10 | Трейдер | Вход/стоп/тейк-профит для MT5 |
+| 11 | Агрессивный риск | Анализ максимального апсайда |
+| 12 | Консервативный риск | Сохранение капитала |
+| 13 | Нейтральный риск | Сбалансированная оценка |
+| 14 | Портфельный менеджер | Финальное решение с размером лота |
 
 ---
 

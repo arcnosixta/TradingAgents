@@ -35,6 +35,14 @@ def write_report_tree(final_state: dict, ticker: str, save_path) -> Path:
         analysts_dir.mkdir(exist_ok=True)
         (analysts_dir / "fundamentals.md").write_text(final_state["fundamentals_report"], encoding="utf-8")
         analyst_parts.append(("Fundamentals Analyst", final_state["fundamentals_report"]))
+    if final_state.get("smart_money_4h_report"):
+        analysts_dir.mkdir(exist_ok=True)
+        (analysts_dir / "smart_money_4h.md").write_text(final_state["smart_money_4h_report"], encoding="utf-8")
+        analyst_parts.append(("Smart Money 4H Analyst", final_state["smart_money_4h_report"]))
+    if final_state.get("smart_money_15m_report"):
+        analysts_dir.mkdir(exist_ok=True)
+        (analysts_dir / "smart_money_15m.md").write_text(final_state["smart_money_15m_report"], encoding="utf-8")
+        analyst_parts.append(("Smart Money 15M Analyst", final_state["smart_money_15m_report"]))
     if analyst_parts:
         content = "\n\n".join(f"### {name}\n{text}" for name, text in analyst_parts)
         sections.append(f"## I. Analyst Team Reports\n\n{content}")

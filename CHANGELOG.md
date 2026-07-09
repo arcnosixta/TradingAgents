@@ -15,6 +15,12 @@ structured output.
 
 ### Added
 
+- **Smart Money agents (LangGraph pipeline).** Two new analysts — `Smart Money 4H`
+  (swing structure, HTF order blocks, liquidity pools, premium/discount zones) and
+  `Smart Money 15M` (intraday micro-structure, entry zones, volume profile, FVG)
+  — are now available in the LangGraph pipeline via `selected_analysts`. The
+  OpenCode pipeline already had these agents; this brings feature parity.
+  (#PLAN_v2)
 - **CI gate.** GitHub Actions runs the pytest suite across Python 3.10-3.13,
   strict `ruff`, and a clean-install smoke that imports the package and CLI to
   catch undeclared dependencies. (#994, #197)
