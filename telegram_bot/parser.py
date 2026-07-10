@@ -1,4 +1,10 @@
-"""Parse final_decision.md and format as Telegram message."""
+"""Parse final_decision.md and format as Telegram message.
+
+Enhanced formatting with:
+- Risk/Reward ratio calculation
+- Visual separators
+- Compact summary for button-driven UI
+"""
 
 import re
 import sys
@@ -37,10 +43,25 @@ def _extract_section(text: str, header: str) -> str:
     return ""
 
 
+def _calc_rr(entry, sl, tp) -> str:
+    """Calculate Risk:Reward ratio."""
+    if not all(isinstance(v, (int, float)) and v > 0 for v in (entry, sl, tp)):
+        return "N/A"
+    risk = abs(entry - sl)
+    reward = abs(tp - entry)
+    if risk == 0:
+        return "N/A"
+    ratio = reward / risk
+    return f"1:{ratio:.1f}"
+
+
 def format_decision(result: RunResult) -> str:
-    """Format RunResult as a readable Telegram message."""
+    """Format RunResult as a readable Telegram message with rich layout."""
     if result.status == "failed":
-        return f"❌ Анализ *{result.ticker}* не удался.\n\n{result.final_decision[:500]}"
+        return (
+            f"❌ Анализ *{result.ticker}* не удался.\n\n"
+            f"{result.final_decision[:500]}"
+        )
 
     text = result.final_decision
 
@@ -58,7 +79,10 @@ def format_decision(result: RunResult) -> str:
 
     # If TP is missing or looks wrong, try to parse Take Profit 1 specifically
     if tp is None or tp == 1.0:
-        tp_match = re.search(r"(?:TAKE_PROFIT_1|Take Profit 1)[:\s]+([\d,]+\.?\d*)", text, re.IGNORECASE)
+        tp_match = re.search(
+            r"(?:TAKE_PROFIT_1|Take Profit 1)[:\s]+([\d,]+\.?\d*)",
+            text, re.IGNORECASE,
+        )
         if tp_match:
             try:
                 tp = float(tp_match.group(1).replace(",", ""))
@@ -80,13 +104,13 @@ def format_decision(result: RunResult) -> str:
     lot_match = re.search(r"(?:Lot Size|LOT_SIZE)[:\s]+([\d.]+)", text, re.IGNORECASE)
     lot_size = lot_match.group(1) if lot_match else "N/A"
 
+    # R:R ratio
+    rr = _calc_rr(entry, sl, tp)
+
     # Rating emoji
     rating_emoji = {
-        "Buy": "🟢",
-        "Overweight": "🟡",
-        "Hold": "⚪",
-        "Underweight": "🟠",
-        "Sell": "🔴",
+        "Buy": "🟢", "Overweight": "🟡", "Hold": "⚪",
+        "Underweight": "🟠", "Sell": "🔴",
     }.get(rating, "⚪")
 
     # Action emoji
@@ -98,11 +122,14 @@ def format_decision(result: RunResult) -> str:
             return "N/A"
         return f"{val:,.2f}" if isinstance(val, (int, float)) else str(val)
 
-    # Build message
+    # ── Build message ──────────────────────────────────────────────
     lines = [
-        f"📊 *{result.ticker}* | {result.trade_date}",
+        f"{'━' * 24}",
+        f"📊 *{result.ticker}*  |  {result.trade_date}",
+        f"{'━' * 24}",
         "",
-        f"{rating_emoji} *RATING:* `{rating}`",
+        f"{rating_emoji} *RATING:*  `{rating}`",
+        f"🎯 *Confidence:*  `{confidence}`",
         "",
     ]
 
@@ -114,34 +141,37 @@ def format_decision(result: RunResult) -> str:
         ])
 
     lines.extend([
-        f"{action_emoji} *TRADE PLAN:*",
-        f"├─ Action: `{action}`",
-        f"├─ Entry: `{fmt(entry)}`",
-        f"├─ Stop Loss: `{fmt(sl)}`",
-        f"├─ Take Profit: `{fmt(tp)}`",
-        f"├─ Lot Size: `{lot_size}`",
-        f"└─ Confidence: `{confidence}`",
+        f"{'─' * 24}",
+        f"{action_emoji} *TRADE PLAN*",
+        f"{'─' * 24}",
+        f"  Action:       `{action}`",
+        f"  Entry:        `{fmt(entry)}`",
+        f"  Stop Loss:    `{fmt(sl)}`",
+        f"  Take Profit:  `{fmt(tp)}`",
+        f"  Lot Size:     `{lot_size}`",
+        f"  R:R:          `{rr}`",
+        f"{'─' * 24}",
         "",
-        f"🕐 Horizon: 12-24 hours",
+        "🕐 Horizon: 12-24 hours",
     ])
 
     # Timing
     if result.elapsed > 0:
         mins = int(result.elapsed // 60)
         secs = int(result.elapsed % 60)
-        lines.append(f"⏱ Analysis took: {mins}m {secs}s")
+        lines.append(f"⏱ Время анализа: {mins}m {secs}s")
 
     if result.run_dir:
         run_name = Path(result.run_dir).name
-        lines.append(f"📁 Run: `{run_name}`")
+        lines.append(f"📁 `{run_name}`")
 
     return "\n".join(lines)
 
 
 def _escape_md(text: str) -> str:
-    """Escape MarkdownV2 special characters for Telegram."""
-    # Only escape characters that break Telegram MarkdownV2
-    for ch in r"_*[]()~`>#+-=|{}.!":
+    """Escape Markdown special characters for Telegram (v1 mode)."""
+    # In Markdown v1 mode, only these need escaping inside normal text
+    for ch in ("_", "*", "`", "["):
         text = text.replace(ch, f"\\{ch}")
     return text
 

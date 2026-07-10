@@ -1,4 +1,4 @@
-"""FastAPI application for TradingAgents web dashboard."""
+"""FastAPI application for TradingAgents web dashboard + landing."""
 
 import datetime
 import json
@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -16,12 +16,17 @@ from web.runner import RunManager
 PROJECT_ROOT = Path(__file__).parent.parent
 RUNS_DIR = PROJECT_ROOT / "runs"
 
-app = FastAPI(title="TradingAgents Dashboard")
+app = FastAPI(title="TradingAgents")
 
-# Mount static files
+# Mount static files for existing dashboard
 static_dir = Path(__file__).parent / "static"
 static_dir.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+# Mount landing static files
+landing_dir = PROJECT_ROOT / "landing"
+if landing_dir.exists():
+    app.mount("/landing", StaticFiles(directory=str(landing_dir)), name="landing")
 
 # Templates
 templates_dir = Path(__file__).parent / "templates"
@@ -32,7 +37,17 @@ templates = Jinja2Templates(directory=str(templates_dir))
 runner = RunManager(str(PROJECT_ROOT))
 
 
+# ── Landing page ──
 @app.get("/", response_class=HTMLResponse)
+async def landing():
+    landing_html = landing_dir / "index.html"
+    if landing_html.exists():
+        return FileResponse(str(landing_html))
+    return RedirectResponse("/dashboard")
+
+
+# ── Dashboard (moved from /) ──
+@app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
     runs = scan_runs(str(RUNS_DIR))
     running = runner.get_status()

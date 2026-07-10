@@ -13,3 +13,5 @@ ALLOWED_USER_IDS: list[int] = [
     int(uid.strip()) for uid in _raw_ids.split(",") if uid.strip().isdigit()
 ]
 PROJECT_ROOT = Path(__file__).parent.parent
+
+WEBAPP_URL = "https://young-base-4f1f.arcnosixta.workers.dev"

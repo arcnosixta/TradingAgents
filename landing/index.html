@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingAgents — AI-анализ рынка на 14 агентах</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>📊</text></svg>">
+    <meta name="description" content="TradingAgents — Telegram бот для AI-анализа рынка. 14 AI-агентов анализируют актив и дают сигнал с Entry, Stop Loss и Take Profit.">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+    <!-- ═══ Navigation ═══ -->
+    <nav class="nav" id="nav">
+        <div class="nav-inner">
+            <a href="/" class="logo">TradingAgents</a>
+            <div class="nav-links">
+                <a href="#how-it-works">Как работает</a>
+                <a href="#agents">Агенты</a>
+                <a href="#pipeline">Пайплайн</a>
+                <a href="#sample">Результат</a>
+                <a href="https://t.me/treingagns_bot" class="btn-nav" target="_blank" rel="noopener">Telegram Bot</a>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Меню">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ═══ Mobile Menu ═══ -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#how-it-works" class="mobile-link">Как работает</a>
+        <a href="#agents" class="mobile-link">Агенты</a>
+        <a href="#pipeline" class="mobile-link">Пайплайн</a>
+        <a href="#sample" class="mobile-link">Результат</a>
+        <a href="https://t.me/treingagns_bot" class="mobile-link btn-nav" target="_blank" rel="noopener">Telegram Bot</a>
+    </div>
+
+    <!-- ═══ Hero ═══ -->
+    <section class="hero" id="hero">
+        <div class="hero-bg" id="heroCanvas"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge">🤖 14 AI-агентов · LangGraph · OpenCode</div>
+            <h1 class="hero-title">AI-анализ рынка<br>на <span class="gradient-text">14 агентах</span></h1>
+            <p class="hero-subtitle">
+                Telegram бот запускает 14 AI-агентов: аналитиков, исследователей,
+                риск-менеджеров и портфельного менеджера.<br>
+                За 5–15 минут получаете сигнал с Entry, Stop Loss и Take Profit.
+            </p>
+            <div class="hero-actions">
+                <a href="https://t.me/treingagns_bot" class="btn-primary" target="_blank" rel="noopener">
+                    🚀 Открыть бота
+                </a>
+                <a href="#how-it-works" class="btn-secondary">Как это работает</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-num" data-count="14">0</span>
+                    <span class="stat-label">AI-агентов</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num" data-count="5">0</span>
+                    <span class="stat-label">минут анализа</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num" data-count="10">0</span>
+                    <span class="stat-label">фаз пайплайна</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ How It Works ═══ -->
+    <section class="section" id="how-it-works">
+        <div class="container">
+            <div class="section-label">Процесс</div>
+            <h2 class="section-title">Как это работает</h2>
+            <p class="section-desc">4 простых шага от тикера до торгового сигнала</p>
+
+            <div class="steps-grid">
+                <div class="step-card" data-delay="0">
+                    <div class="step-num">1</div>
+                    <div class="step-icon">📊</div>
+                    <h3>Выберите актив</h3>
+                    <p>XAU-USD, BTC-USD, AAPL, NVDA, EURUSD — любой тикер. Введите в боте или выберите из популярных.</p>
+                </div>
+                <div class="step-card" data-delay="0.1">
+                    <div class="step-num">2</div>
+                    <div class="step-icon">🤖</div>
+                    <h3>14 AI-агентов</h3>
+                    <p>Четыре аналитика параллельно, Smart Money, Bull/Bear исследователи, три риск-дебатора и Portfolio Manager.</p>
+                </div>
+                <div class="step-card" data-delay="0.2">
+                    <div class="step-num">3</div>
+                    <div class="step-icon">⏳</div>
+                    <h3>5–15 минут</h3>
+                    <p>Агенты собирают данные, анализируют, спорят. Вы видите прогресс в реальном времени с анимацией фаз.</p>
+                </div>
+                <div class="step-card" data-delay="0.3">
+                    <div class="step-num">4</div>
+                    <div class="step-icon">🎯</div>
+                    <h3>Получите сигнал</h3>
+                    <p>Rating (Buy/Sell/Hold), Entry Price, Stop Loss, Take Profit, R:R, Confidence — всё в одном сообщении.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Agents ═══ -->
+    <section class="section section-dark" id="agents">
+        <div class="container">
+            <div class="section-label">Команда</div>
+            <h2 class="section-title">14 AI-агентов</h2>
+            <p class="section-desc">Каждый агент — отдельная AI-модель со своей специализацией</p>
+
+            <div class="agent-categories">
+                <div class="category">
+                    <div class="category-label">📊 Аналитики</div>
+                    <div class="agent-grid">
+                        <div class="agent-card"><span class="agent-icon">📈</span><h4>Market Analyst</h4><p>Технический анализ: тренды, уровни, индикаторы</p></div>
+                        <div class="agent-card"><span class="agent-icon">💬</span><h4>Sentiment Analyst</h4><p>Настроение рынка: новости, StockTwits, Reddit</p></div>
+                        <div class="agent-card"><span class="agent-icon">📰</span><h4>News Analyst</h4><p>Глобальные новости, макроэкономика, прогнозы</p></div>
+                        <div class="agent-card"><span class="agent-icon">📋</span><h4>Fundamentals Analyst</h4><p>Фундаментальный анализ: баланс, прибыль, долги</p></div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-label">💰 Smart Money</div>
+                    <div class="agent-grid">
+                        <div class="agent-card"><span class="agent-icon">⏰</span><h4>Smart Money 4H</h4><p>Среднесрочный анализ на 4-часовом таймфрейме</p></div>
+                        <div class="agent-card"><span class="agent-icon">⚡</span><h4>Smart Money 15M</h4><p>Краткосрочный анализ на 15-минутном таймфрейме</p></div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-label">🔬 Исследователи</div>
+                    <div class="agent-grid">
+                        <div class="agent-card"><span class="agent-icon">🐂</span><h4>Bull Researcher</h4><p>Бычий сценарий: аргументы за рост актива</p></div>
+                        <div class="agent-card"><span class="agent-icon">🐻</span><h4>Bear Researcher</h4><p>Медвежий сценарий: контраргументы и риски</p></div>
+                        <div class="agent-card"><span class="agent-icon">📐</span><h4>Research Manager</h4><p>Синтезирует оба сценария в план исследования</p></div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-label">📈 Трейдинг</div>
+                    <div class="agent-grid">
+                        <div class="agent-card"><span class="agent-icon">📊</span><h4>Trader</h4><p>Формирует торговое предложение: Entry, SL, TP</p></div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-label">🛡️ Риск-менеджмент</div>
+                    <div class="agent-grid">
+                        <div class="agent-card"><span class="agent-icon">🔥</span><h4>Risk Aggressive</h4><p>Агрессивная оценка риска, максимальная прибыль</p></div>
+                        <div class="agent-card"><span class="agent-icon">🛡️</span><h4>Risk Conservative</h4><p>Консервативная оценка, сохранение капитала</p></div>
+                        <div class="agent-card"><span class="agent-icon">⚖️</span><h4>Risk Neutral</h4><p>Балансирует между агрессивным и консервативным</p></div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-label">👔 Финальное решение</div>
+                    <div class="agent-grid">
+                        <div class="agent-card"><span class="agent-icon">🏆</span><h4>Portfolio Manager</h4><p>Принимает окончательное решение: Rating + Trade Plan</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Pipeline ═══ -->
+    <section class="section" id="pipeline">
+        <div class="container">
+            <div class="section-label">Параллелизм</div>
+            <h2 class="section-title">Пайплайн выполнения</h2>
+            <p class="section-desc">10 фаз, но только 6 wall-clock шагов за счёт параллельного выполнения</p>
+
+            <div class="pipeline">
+                <div class="phase" data-phase="1">
+                    <div class="phase-header">
+                        <span class="phase-badge phase-running">Phase 1</span>
+                        <span class="phase-name">Аналитики</span>
+                        <span class="phase-count">4 агента ⚡ параллельно</span>
+                    </div>
+                    <div class="phase-agents">
+                        <span class="phase-agent">Market</span>
+                        <span class="phase-agent">Sentiment</span>
+                        <span class="phase-agent">News</span>
+                        <span class="phase-agent">Fundamentals</span>
+                    </div>
+                </div>
+
+                <div class="phase" data-phase="2">
+                    <div class="phase-header">
+                        <span class="phase-badge phase-running">Phase 2</span>
+                        <span class="phase-name">Smart Money</span>
+                        <span class="phase-count">2 агента ⚡ параллельно</span>
+                    </div>
+                    <div class="phase-agents">
+                        <span class="phase-agent">SM 4H</span>
+                        <span class="phase-agent">SM 15M</span>
+                    </div>
+                </div>
+
+                <div class="phase" data-phase="3">
+                    <div class="phase-header">
+                        <span class="phase-badge">Phase 3–10</span>
+                        <span class="phase-name">Исследователи → Трейдер → Риски → PM</span>
+                        <span class="phase-count">8 агентов последовательно</span>
+                    </div>
+                    <div class="phase-agents">
+                        <span class="phase-agent">🐂 Bull</span>
+                        <span class="phase-agent">🐻 Bear</span>
+                        <span class="phase-agent">🔬 RM</span>
+                        <span class="phase-agent">📈 Trader</span>
+                        <span class="phase-agent">🔥 Aggr</span>
+                        <span class="phase-agent">🛡️ Cons</span>
+                        <span class="phase-agent">⚖️ Neut</span>
+                        <span class="phase-agent">🏆 PM</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pipeline-benefits">
+                <div class="benefit">
+                    <span class="benefit-value">~30%</span>
+                    <span class="benefit-label">ускорение за счёт параллелизма</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-value">10</span>
+                    <span class="benefit-label">фаз вместо 14 шагов</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-value">4</span>
+                    <span class="benefit-label">модели fallback при ошибках</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Sample Result ═══ -->
+    <section class="section section-dark" id="sample">
+        <div class="container">
+            <div class="section-label">Пример</div>
+            <h2 class="section-title">Как выглядит результат</h2>
+            <p class="section-desc">Реальный сигнал после анализа всех 14 агентов</p>
+
+            <div class="sample-card">
+                <div class="sample-header">
+                    <span class="sample-ticker">XAU-USD</span>
+                    <span class="sample-date">2026-07-10</span>
+                    <span class="sample-rating rating-buy">🟢 Buy</span>
+                </div>
+                <div class="sample-body">
+                    <div class="sample-summary">
+                        <strong>Summary:</strong>
+                        Золото показывает сильный бычий импульс на фоне снижения доллара и геополитической напряжённости. Smart Money подтверждает восходящий тренд на 4H и 15M таймфреймах.
+                    </div>
+                    <div class="sample-plan">
+                        <div class="plan-row"><span>Action</span><span class="tag tag-buy">📈 Buy</span></div>
+                        <div class="plan-row"><span>Entry</span><span class="mono">$3,345.50</span></div>
+                        <div class="plan-row"><span>Stop Loss</span><span class="mono red">$3,295.00</span></div>
+                        <div class="plan-row"><span>Take Profit</span><span class="mono green">$3,446.50</span></div>
+                        <div class="plan-row"><span>Lot Size</span><span>0.5</span></div>
+                        <div class="plan-row"><span>R:R</span><span class="tag tag-buy">1:2.0</span></div>
+                        <div class="plan-row"><span>Confidence</span><span class="tag tag-buy">High</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Trust / Why Us ═══ -->
+    <section class="section" id="trust">
+        <div class="container">
+            <div class="section-label">Почему мы</div>
+            <h2 class="section-title">Технологии и прозрачность</h2>
+            <p class="section-desc">В основе — проверенные технологии и открытая архитектура</p>
+
+            <div class="trust-grid">
+                <div class="trust-card">
+                    <div class="trust-icon">🧠</div>
+                    <h3>LangGraph</h3>
+                    <p>Графовый пайплайн с чёткими зависимостями между агентами. Никакого хаоса.</p>
+                </div>
+                <div class="trust-card">
+                    <div class="trust-icon">🔄</div>
+                    <h3>Model Fallback</h3>
+                    <p>4 модели в очереди: Mimo → Big-Pickle → Gemini → GPT-4o. Если одна упала — следующая.</p>
+                </div>
+                <div class="trust-card">
+                    <div class="trust-icon">🔬</div>
+                    <h3>50+ тестов</h3>
+                    <p>Покрытие кода тестами: entry-валидация, dataflows, инструменты агентов.</p>
+                </div>
+                <div class="trust-card">
+                    <div class="trust-icon">📊</div>
+                    <h3>Smart Money</h3>
+                    <p>Анализ 4H + 15M таймфреймов по методологии Smart Money Concept (ICT).</p>
+                </div>
+                <div class="trust-card">
+                    <div class="trust-icon">⚡</div>
+                    <h3>Параллельное выполнение</h3>
+                    <p>Агенты без зависимостей запускаются одновременно через ThreadPoolExecutor.</p>
+                </div>
+                <div class="trust-card">
+                    <div class="trust-icon">💬</div>
+                    <h3>Telegram Bot UI</h3>
+                    <p>Inline кнопки, анимированный прогресс-бар, выбор тикера и даты в несколько нажатий.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Tech Stack ═══ -->
+    <section class="section section-dark" id="tech">
+        <div class="container">
+            <div class="section-label">Стек</div>
+            <h2 class="section-title">Технологии</h2>
+            <div class="tech-strip">
+                <span class="tech-pill">🐍 Python 3.14</span>
+                <span class="tech-pill">🤖 OpenCode CLI</span>
+                <span class="tech-pill">🧠 LangGraph</span>
+                <span class="tech-pill">📈 yfinance</span>
+                <span class="tech-pill">📰 Alpha Vantage</span>
+                <span class="tech-pill">💬 python-telegram-bot</span>
+                <span class="tech-pill">🏦 FRED</span>
+                <span class="tech-pill">🔴 Reddit API</span>
+                <span class="tech-pill">💼 StockTwits</span>
+                <span class="tech-pill">🎲 Polymarket</span>
+                <span class="tech-pill">⚡ ThreadPoolExecutor</span>
+                <span class="tech-pill">📊 fl_chart</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ CTA ═══ -->
+    <section class="section cta-section">
+        <div class="container">
+            <h2 class="cta-title">Готовы попробовать?</h2>
+            <p class="cta-text">
+                Откройте бота в Telegram, выберите актив и через 5–15 минут<br>
+                получите готовый торговый сигнал с RATING, Entry, SL и TP.
+            </p>
+            <a href="https://t.me/treingagns_bot" class="btn-primary btn-large" target="_blank" rel="noopener">
+                🚀 Открыть в Telegram
+            </a>
+        </div>
+    </section>
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="logo">TradingAgents</span>
+                    <p class="footer-desc">AI-анализ рынка на 14 агентах. Не является инвестиционной рекомендацией.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Навигация</h4>
+                    <a href="#how-it-works">Как работает</a>
+                    <a href="#agents">Агенты</a>
+                    <a href="#pipeline">Пайплайн</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Ресурсы</h4>
+                    <a href="https://t.me/treingagns_bot" target="_blank">Telegram Bot</a>
+                    <a href="https://github.com/arcnosixta/TradingAgents" target="_blank">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 TradingAgents. Все права защищены.</span>
+                <span class="disclaimer">Торговля на финансовых рынках сопряжена с риском. Прошлые результаты не гарантируют будущих.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ═══ Telegram WebApp init ═══ -->
+    <script>
+    (function() {
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand();
+            tg.ready();
+        }
+    })();
+    </script>
+
+    <!-- ═══ Scripts ═══ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="/landing/js/three-hero.js"></script>
+    <script src="/landing/js/particles.js"></script>
+    <script src="/landing/js/main.js"></script>
+</body>
+</html>

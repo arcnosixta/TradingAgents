@@ -220,6 +220,7 @@ __marimo__/
 
 # Enterprise env file (secrets) and generated run reports
 .env.enterprise
+.env.telegram
 reports/
 
 # Pipeline run outputs
