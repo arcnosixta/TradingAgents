@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" width="120" alt="TradingAgents logo">
+</p>
+
 # TradingAgents
 
 Multi-agent LLM trading framework for intraday analysis. Runs 14 specialized AI agents sequentially to produce actionable trade signals.
